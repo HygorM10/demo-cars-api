@@ -1,0 +1,15 @@
+spring:
+  web:
+    locale-resolver: fixed
+    locale: pt_BR
+  datasource:
+    url: jdbc:postgresql://localhost:5432/demo_park?currentSchema=demo_park&useSSL=false&serverTimezone=America/Sao_Paulo
+    username: postgres
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: false
