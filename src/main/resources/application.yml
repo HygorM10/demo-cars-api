@@ -13,3 +13,9 @@ spring:
     properties:
       hibernate:
         format_sql: false
+springdoc:
+  swagger-ui:
+    path: /docs-park.html
+  api-docs:
+    path: /docs-park
+  packages-to-scan: org.hygorm10.demoparkapi.controller
