@@ -110,6 +110,11 @@ class UsuarioController(
                 responseCode = "404",
                 description = "Recurso não encontrado.",
                 content = [Content(mediaType = "application/json")],
+            ),
+            ApiResponse(
+                responseCode = "422",
+                description = "Senha antiga inválida.",
+                content = [Content(mediaType = "application/json")],
             )
         ]
     )

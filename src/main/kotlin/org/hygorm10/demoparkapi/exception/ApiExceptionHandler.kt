@@ -12,6 +12,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 @RestControllerAdvice
 class ApiExceptionHandler {
 
+    @ExceptionHandler(PasswordInvalidException::class)
+    fun passwordInvalidException(
+        exception: RuntimeException,
+        request: HttpServletRequest
+    ): ResponseEntity<ErrorMessage> {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(
+                ErrorMessage(
+                    request, HttpStatus.BAD_REQUEST,
+                    exception.message!!
+                )
+            )
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun methodArgumentNotValidException(
         exception: MethodArgumentNotValidException,

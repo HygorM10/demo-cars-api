@@ -3,6 +3,7 @@ package org.hygorm10.demoparkapi.service
 import jakarta.transaction.Transactional
 import org.hygorm10.demoparkapi.entity.Usuario
 import org.hygorm10.demoparkapi.exception.EntityNotFoundException
+import org.hygorm10.demoparkapi.exception.PasswordInvalidException
 import org.hygorm10.demoparkapi.exception.UsernameUniqueViolationException
 import org.hygorm10.demoparkapi.repository.UsuarioRepository
 import org.springframework.dao.DataIntegrityViolationException
@@ -36,9 +37,9 @@ class UsuarioService(
 
     @Transactional
     fun updatePassword(id: Long, newPassword: String, oldPassword: String, newPasswordConfirmation: String): Usuario {
-        if (newPassword != newPasswordConfirmation) throw Exception("As senhas não conferem.")
+        if (newPassword != newPasswordConfirmation) throw PasswordInvalidException("As senhas não conferem.")
         val user = getById(id)
-        if (user.password != oldPassword) throw Exception("Senha antiga incorreta.")
+        if (user.password != oldPassword) throw PasswordInvalidException("Senha antiga incorreta.")
         return create(user.copy(password = newPassword))
     }
 
