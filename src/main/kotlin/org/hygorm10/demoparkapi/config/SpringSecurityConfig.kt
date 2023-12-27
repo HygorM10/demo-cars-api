@@ -1,5 +1,6 @@
 package org.hygorm10.demoparkapi.config
 
+import org.hygorm10.demoparkapi.config.jwt.JwtAuthenticationEntryPoint
 import org.hygorm10.demoparkapi.config.jwt.JwtAuthorizationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -28,11 +29,19 @@ class SpringSecurityConfig {
             .httpBasic { httpBasic -> httpBasic.disable() }
             .authorizeHttpRequests { auth ->
                 auth.requestMatchers(POST, "api/v1/usuarios").permitAll()
-                auth.requestMatchers(POST, "api/v1/auth").permitAll()
+                    .requestMatchers(POST, "api/v1/auth").permitAll()
+                    .requestMatchers(
+                        "/docs/index.html",
+                        "/docs-park.html", "/docs-park/**",
+                        "/v3/api-docs/**",
+                        "/swagger-ui-custom.html/**", "/swagger-ui.html", "/swagger-ui/**",
+                        "/**.html", "/webjars/**", "/configuration/**", "/swagger-resources/**"
+                    ).permitAll()
                     .anyRequest().authenticated()
             }
             .sessionManagement { session -> session.sessionCreationPolicy(STATELESS) }
             .addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter::class.java)
+            .exceptionHandling { ex -> ex.authenticationEntryPoint(JwtAuthenticationEntryPoint()) }
             .build()
     }
 

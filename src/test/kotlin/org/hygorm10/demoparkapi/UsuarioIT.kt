@@ -8,6 +8,7 @@ import org.hygorm10.demoparkapi.exception.ErrorMessage
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -26,6 +27,7 @@ class UsuarioIT {
     fun `should create user success`() {
         val responseBody: UsuarioResponseDto? = testCliet.post()
             .uri("/api/v1/usuarios")
+            .headers(JwtAuthentication.getHeaderAuthorization(testCliet, "ana@email.com", "123456"))
             .contentType(APPLICATION_JSON)
             .bodyValue(UsuarioCreateDto(username = "hygor@gmail.com", password = "123456"))
             .exchange()
@@ -43,6 +45,7 @@ class UsuarioIT {
     fun `should return status code 422 in create user with username incorrect`() {
         val responseBody: ErrorMessage? = testCliet.post()
             .uri("/api/v1/usuarios")
+            .headers(JwtAuthentication.getHeaderAuthorization(testCliet, "ana@email.com", "123456"))
             .contentType(APPLICATION_JSON)
             .bodyValue(UsuarioCreateDto(username = "", password = "123456"))
             .exchange()
@@ -58,6 +61,7 @@ class UsuarioIT {
     fun `should return status code 422 in create user with password incorrect`() {
         val responseBody: ErrorMessage? = testCliet.post()
             .uri("/api/v1/usuarios")
+            .headers(JwtAuthentication.getHeaderAuthorization(testCliet, "ana@email.com", "123456"))
             .contentType(APPLICATION_JSON)
             .bodyValue(UsuarioCreateDto(username = "hygor@gmail.com", password = ""))
             .exchange()
@@ -73,6 +77,7 @@ class UsuarioIT {
     fun `should return status code 409 in create user case username already exists`() {
         val responseBody: ErrorMessage? = testCliet.post()
             .uri("/api/v1/usuarios")
+            .headers(JwtAuthentication.getHeaderAuthorization(testCliet, "ana@email.com", "123456"))
             .contentType(APPLICATION_JSON)
             .bodyValue(UsuarioCreateDto(username = "ana@email.com", password = "123456"))
             .exchange()
@@ -88,6 +93,7 @@ class UsuarioIT {
     fun `should find user by id success`() {
         val responseBody: UsuarioResponseDto? = testCliet.get()
             .uri("/api/v1/usuarios/{id}", 100)
+            .headers(JwtAuthentication.getHeaderAuthorization(testCliet, "ana@email.com", "123456"))
             .exchange()
             .expectStatus().isOk
             .expectBody(UsuarioResponseDto::class.java)
@@ -100,9 +106,25 @@ class UsuarioIT {
     }
 
     @Test
+    fun `should send status 401 in find user by id case authentication fail`() {
+        val result = testCliet.get()
+            .uri("/api/v1/usuarios/{id}", 100)
+            .headers(JwtAuthentication.getHeaderAuthorization(testCliet, "bia@email.com", "123456"))
+            .exchange()
+            .expectStatus().isEqualTo(HttpStatus.FORBIDDEN)
+            .expectBody(ErrorMessage::class.java)
+            .returnResult().responseBody
+
+        assertThat(result).isNotNull
+        assertThat(result?.status).isEqualTo(HttpStatus.FORBIDDEN.value())
+        assertThat(result?.message).isEqualTo("Access Denied")
+    }
+
+    @Test
     fun `should return status code 404 case user not found`() {
         val responseBody: ErrorMessage? = testCliet.get()
             .uri("/api/v1/usuarios/{id}", 0)
+            .headers(JwtAuthentication.getHeaderAuthorization(testCliet, "ana@email.com", "123456"))
             .exchange()
             .expectStatus().isNotFound
             .expectBody(ErrorMessage::class.java)
@@ -116,6 +138,7 @@ class UsuarioIT {
     fun `should update password by id with success`() {
         testCliet.patch()
             .uri("/api/v1/usuarios/{id}", 100)
+            .headers(JwtAuthentication.getHeaderAuthorization(testCliet, "ana@email.com", "123456"))
             .contentType(APPLICATION_JSON)
             .bodyValue(UsuarioPasswordUpdateDto("123456", "123457", "123457"))
             .exchange()
@@ -123,19 +146,10 @@ class UsuarioIT {
     }
 
     @Test
-    fun `should return status code 404 in update password by id case user not found`() {
-        testCliet.patch()
-            .uri("/api/v1/usuarios/{id}", 0)
-            .contentType(APPLICATION_JSON)
-            .bodyValue(UsuarioPasswordUpdateDto("123456", "123457", "123457"))
-            .exchange()
-            .expectStatus().isNotFound
-    }
-
-    @Test
     fun `should return status code 400 in update password by id case old password is invalid`() {
         val responseBody = testCliet.patch()
             .uri("/api/v1/usuarios/{id}", 100)
+            .headers(JwtAuthentication.getHeaderAuthorization(testCliet, "ana@email.com", "123456"))
             .contentType(APPLICATION_JSON)
             .bodyValue(UsuarioPasswordUpdateDto("123451", "123456", "123456"))
             .exchange()
@@ -151,6 +165,7 @@ class UsuarioIT {
     fun `should return status code 400 in update password by id case new password and confirmation password is different`() {
         val responseBody = testCliet.patch()
             .uri("/api/v1/usuarios/{id}", 100)
+            .headers(JwtAuthentication.getHeaderAuthorization(testCliet, "ana@email.com", "123456"))
             .contentType(APPLICATION_JSON)
             .bodyValue(UsuarioPasswordUpdateDto("123457", "123459", "123458"))
             .exchange()
@@ -166,6 +181,7 @@ class UsuarioIT {
     fun `should return status code 422 in update password by id case password is invalid`() {
         val responseBody = testCliet.patch()
             .uri("/api/v1/usuarios/{id}", 100)
+            .headers(JwtAuthentication.getHeaderAuthorization(testCliet, "ana@email.com", "123456"))
             .contentType(APPLICATION_JSON)
             .bodyValue(UsuarioPasswordUpdateDto("", "", ""))
             .exchange()
@@ -181,6 +197,7 @@ class UsuarioIT {
     fun `should list all users success`() {
         val responseBody: List<UsuarioResponseDto>? = testCliet.get()
             .uri("/api/v1/usuarios")
+            .headers(JwtAuthentication.getHeaderAuthorization(testCliet, "ana@email.com", "123456"))
             .exchange()
             .expectStatus().isOk
             .expectBodyList(UsuarioResponseDto::class.java)

@@ -42,7 +42,7 @@ class UsuarioService(
     fun updatePassword(id: Long, newPassword: String, oldPassword: String, newPasswordConfirmation: String): Usuario {
         if (newPassword != newPasswordConfirmation) throw PasswordInvalidException("As senhas não conferem.")
         val user = getById(id)
-        if (passwordEncoder.matches(
+        if (!passwordEncoder.matches(
                 oldPassword,
                 user.password
             )

@@ -14,12 +14,12 @@ import java.util.Date
 class JwtUtils {
 
     companion object {
-        val JWT_BEARER = "Bearer "
-        val JWT_AUTHORIZATION = "Authorization"
-        val SECRET_KEY = "0123456789-0123456789-0123456789"
-        val EXPIRE_DAYS = 0L
-        val EXPIRE_HOURS = 0L
-        val EXPIRE_MINUTES = 2L
+        const val JWT_BEARER = "Bearer "
+        const val JWT_AUTHORIZATION = "Authorization"
+        private const val SECRET_KEY = "0123456789-0123456789-0123456789"
+        private const val EXPIRE_DAYS = 0L
+        private const val EXPIRE_HOURS = 0L
+        private const val EXPIRE_MINUTES = 30L
 
         private fun generateKey(): Key {
             return Keys.hmacShaKeyFor(SECRET_KEY.toByteArray(UTF_8))

@@ -3,6 +3,7 @@ package org.hygorm10.demoparkapi.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.hygorm10.demoparkapi.controller.dto.UsuarioCreateDto
@@ -11,6 +12,7 @@ import org.hygorm10.demoparkapi.controller.dto.UsuarioResponseDto
 import org.hygorm10.demoparkapi.service.UsuarioService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -57,6 +59,7 @@ class UsuarioController(
 
     @Operation(
         summary = "Buscar um usuário por ID", description = "Recurso para procurar um usuário por id.",
+        security = [SecurityRequirement(name = "security")],
         responses = [
             ApiResponse(
                 responseCode = "200",
@@ -71,6 +74,7 @@ class UsuarioController(
         ]
     )
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') OR (hasRole('CLIENTE') AND #id == authentication.principal.id)")
     fun getById(@PathVariable id: Long): ResponseEntity<UsuarioResponseDto> {
         val usuario = usuarioService.getById(id)
         return ResponseEntity.ok(usuario.toUsuarioResponseDto())
@@ -78,6 +82,7 @@ class UsuarioController(
 
     @Operation(
         summary = "Buscar todos os usuários",
+        security = [SecurityRequirement(name = "security")],
         description = "Recurso para buscar todos os usuários cadastrados no sistema.",
         responses = [
             ApiResponse(
@@ -88,6 +93,7 @@ class UsuarioController(
         ]
     )
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     fun getUsers(): ResponseEntity<List<UsuarioResponseDto>> {
         val usuarios = usuarioService.getUsers().map { it.toUsuarioResponseDto() }
         return ResponseEntity.ok(usuarios)
@@ -95,6 +101,7 @@ class UsuarioController(
 
     @Operation(
         summary = "Atualizar senha de usuário", description = "Recurso para atualizar a senha do usuário por ID.",
+        security = [SecurityRequirement(name = "security")],
         responses = [
             ApiResponse(
                 responseCode = "204",
@@ -119,6 +126,7 @@ class UsuarioController(
         ]
     )
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE') AND (#id == authentication.principal.id)")
     fun updatePassword(
         @PathVariable id: Long,
         @Valid @RequestBody dto: UsuarioPasswordUpdateDto

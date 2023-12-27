@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -23,6 +24,22 @@ class ApiExceptionHandler {
             .body(
                 ErrorMessage(
                     request, HttpStatus.BAD_REQUEST,
+                    exception.message!!
+                )
+            )
+    }
+
+    @ExceptionHandler(AccessDeniedException::class)
+    fun accessDeniedException(
+        exception: AccessDeniedException,
+        request: HttpServletRequest
+    ): ResponseEntity<ErrorMessage> {
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(
+                ErrorMessage(
+                    request, HttpStatus.FORBIDDEN,
                     exception.message!!
                 )
             )
