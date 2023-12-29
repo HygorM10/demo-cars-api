@@ -55,13 +55,13 @@ class ApiExceptionHandler {
             .body(ErrorMessage(request, HttpStatus.UNPROCESSABLE_ENTITY, "Campo(s) inválidos", result))
     }
 
-    @ExceptionHandler(UsernameUniqueViolationException::class)
+    @ExceptionHandler(value = [UsernameUniqueViolationException::class, CpfUniqueViolationException::class, CodigoUniqueViolationException::class])
     fun usernameUniqueViolationException(
-        exception: UsernameUniqueViolationException,
+        exception: RuntimeException,
         request: HttpServletRequest
     ): ResponseEntity<ErrorMessage> {
         return ResponseEntity.status(HttpStatus.CONFLICT).contentType(MediaType.APPLICATION_JSON)
-            .body(ErrorMessage(request, HttpStatus.CONFLICT, exception.messages))
+            .body(ErrorMessage(request, HttpStatus.CONFLICT, exception.message!!))
     }
 
     @ExceptionHandler(EntityNotFoundException::class)

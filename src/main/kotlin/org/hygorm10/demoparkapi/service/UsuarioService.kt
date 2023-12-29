@@ -1,6 +1,5 @@
 package org.hygorm10.demoparkapi.service
 
-import jakarta.transaction.Transactional
 import org.hygorm10.demoparkapi.entity.Usuario
 import org.hygorm10.demoparkapi.entity.enums.Role
 import org.hygorm10.demoparkapi.exception.EntityNotFoundException
@@ -10,6 +9,7 @@ import org.hygorm10.demoparkapi.repository.UsuarioRepository
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UsuarioService(
@@ -27,13 +27,13 @@ class UsuarioService(
 
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getById(id: Long): Usuario {
         return usuarioRepository.findById(id)
             .orElseThrow { throw EntityNotFoundException("Usuário id=$id não encontrado.") }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getUsers(): List<Usuario> {
         return usuarioRepository.findAll()
     }
@@ -50,13 +50,13 @@ class UsuarioService(
         return create(user.copy(password = passwordEncoder.encode(newPassword)))
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getByUsername(username: String): Usuario {
         return usuarioRepository.findByUsername(username)
             .orElseThrow { throw EntityNotFoundException("Usuário com username=$username não encontrado.") }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getRoleByUsername(username: String): Role {
         return usuarioRepository.findRoleByUsername(username)
     }
