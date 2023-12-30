@@ -41,4 +41,11 @@ class ClienteService(
         return clienteRepository.findByUsuarioId(id);
     }
 
+    @Transactional(readOnly = true)
+    fun findByCpf(cpf: String): Cliente {
+        return clienteRepository.findByCpf(cpf).orElseThrow {
+            throw EntityNotFoundException("Cliente com CPF $cpf não encontrado")
+        }
+    }
+
 }

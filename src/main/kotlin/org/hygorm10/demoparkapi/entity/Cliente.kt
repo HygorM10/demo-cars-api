@@ -26,7 +26,7 @@ data class Cliente(
     @GeneratedValue(strategy = IDENTITY)
     val id: Long? = null,
     @Column(name = "nome", nullable = false, length = 100)
-    val nome: String,
+    val nome: String? = null,
     @Column(name = "cpf", nullable = false, unique = true, length = 11)
     val cpf: String,
     @OneToOne
@@ -50,7 +50,7 @@ data class Cliente(
     fun toClienteResponseDto(): ClienteResponseDto {
         return ClienteResponseDto(
             id = this.id!!,
-            nome = this.nome,
+            nome = this.nome!!,
             cpf = this.cpf,
         )
     }
